@@ -1,0 +1,7 @@
+Write a tool in the language of your choice that will take the following 2 parameters (version and retention in hours)
+    and spin up a prometheus collector of the given version inside of a docker container.
+
+a. It should be of the version that was specified
+b. It should scrape only itself for metrics.
+c. It should have the specified retention
+d. It should have an accessible UI.
