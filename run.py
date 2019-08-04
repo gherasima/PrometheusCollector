@@ -1,7 +1,6 @@
 import argparse
 import sys
 import os
-import requests
 import json
 import time
 
@@ -15,8 +14,9 @@ if sys.version_info < required_python_min_version:
 # Check if we have all required modules installed
 try:
     import docker
+    import requests
 except ImportError:
-    sys.exit('Docker Python module not found, please install it by running pip3 install docker')
+    sys.exit('Required Python modules not found, please install them by running pip3 install -r requirements.txt')
 
 
 def create_docker_network(docker_network):
