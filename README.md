@@ -3,10 +3,16 @@
 
 Spin up a Grafana and a Prometheus collector of the given version using a custom retention hours inside of a docker container.
 
+## Requirements
+
+Python 3.4 or later.
+
 
 ## Installation
 
+```
 pip3 install -r requirements.txt
+```
 
 ## Usage
 
