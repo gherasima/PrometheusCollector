@@ -1,7 +1,6 @@
 import argparse
 import sys
 import os
-import requests
 import json
 import time
 import re
@@ -16,8 +15,9 @@ if sys.version_info < required_python_min_version:
 # Check if we have all required modules installed
 try:
     import docker
+    import requests
 except ImportError:
-    sys.exit('Docker Python module not found, please install it by running pip3 install docker')
+    sys.exit('Required Python modules not found, please install them by running pip3 install -r requirements.txt')
 
 
 def get_all_prometheus_tag():
@@ -89,7 +89,7 @@ def run_prometheus_container(version, retention, program_usage, docker_network):
     try:
         client.containers.run(image, prometheus_config, ports={'9090/tcp': 9090},  detach=True, name='prometheus', network=docker_network)
     except docker.errors.APIError as e:
-        print("Can't Prometheus start container!")
+        print("Error! Can't start Prometheus container!")
         print(e)
         sys.exit()
 
@@ -117,7 +117,7 @@ def run_grafana_containers(docker_network):
         }
         client.containers.run(image, ports={'3000/tcp': 3000}, environment=grafana_config, detach=True, name='grafana', network=docker_network)
     except docker.errors.APIError as e:
-        print("Can't Grafana start container!")
+        print("Can't start Grafana container!")
         print(e)
         sys.exit()
 
