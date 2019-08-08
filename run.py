@@ -4,6 +4,7 @@ import os
 import requests
 import json
 import time
+import re
 
 # Check for minimum Python version
 required_python_min_version = (3, 4)
@@ -17,6 +18,35 @@ try:
     import docker
 except ImportError:
     sys.exit('Docker Python module not found, please install it by running pip3 install docker')
+
+
+def get_all_prometheus_tag():
+    # Get all image tags
+    url = 'https://registry.hub.docker.com/v1/repositories/prom/prometheus/tags'
+    session = requests.Session()
+    try:
+        r = session.get(url)
+    except:
+        sys.exit(
+            'Error! Can\'t get all prometheus Docker image tags! please make sure you have internet connection')
+    r_json = r.json()
+
+    # Latest major version
+    v0 = []
+    v1 = []
+    v2 = []
+    for v in r_json:
+        ver = v['name']
+        if re.search('rc', ver) or re.search('-', ver):
+            pass
+        else:
+            if ver.startswith('v2'):
+                v2.append(ver)
+            elif ver.startswith('v1'):
+                v1.append(ver)
+            elif ver.startswith('0'):
+                v0.append(ver)
+    return {'v0': v0, 'v1': v1, 'v2': v2}
 
 
 def create_docker_network(docker_network):
@@ -137,6 +167,33 @@ if __name__ == '__main__':
     retention = args.retention
 
     if version and retention:
+
+        if version == 'v1':
+            print('*' * 70)
+            print('Please run the program with one of the following Prometheus version:')
+            print('*' * 70)
+            all_tag = get_all_prometheus_tag()
+            for v in all_tag['v1']:
+                print(v)
+            sys.exit()
+        elif version == 'v2':
+            print('*' * 70)
+            print('Please run the program with one of the following Prometheus version:')
+            print('*' * 70)
+            all_tag = get_all_prometheus_tag()
+            for v in all_tag['v2']:
+                print(v)
+            sys.exit()
+        elif version == 'v0':
+            print('*' * 70)
+            print('Please run the program with one of the following Prometheus version:')
+            print('*' * 70)
+            all_tag = get_all_prometheus_tag()
+            for v in all_tag['v2']:
+                print(v)
+            sys.exit()
+
+
         create_docker_network('prometheus')
         run_prometheus_container(version, retention, program_usage, 'prometheus')
         run_grafana_containers('prometheus')
