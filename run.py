@@ -46,7 +46,7 @@ def get_all_prometheus_tag():
                 v1.append(ver)
             elif ver.startswith('0'):
                 v0.append(ver)
-    return {'v0': v0, 'v1': v1, 'v2': v2}
+    return {'0': v0, 'v1': v1, 'v2': v2}
 
 
 def create_docker_network(docker_network):
@@ -66,9 +66,15 @@ def create_docker_network(docker_network):
 def run_prometheus_container(version, retention, program_usage, docker_network):
     client = docker.from_env()
     image = "prom/prometheus:" + version
-    prometheus_config = (" --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus " 
-                        "--web.console.libraries=/usr/share/prometheus/console_libraries " 
-                        "--web.console.templates=/usr/share/prometheus/consoles --storage.tsdb.retention={}h".format(retention))
+
+    if version.startswith('0') or version.startswith('v1'):
+        prometheus_config = (" -config.file=/etc/prometheus/prometheus.yml -storage.local.path=/prometheus " 
+                            "-web.console.libraries=/usr/share/prometheus/console_libraries " 
+                            "-web.console.templates=/usr/share/prometheus/consoles -storage.local.retention={}h".format(retention))
+    else:
+        prometheus_config = (" --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus "
+                             "--web.console.libraries=/usr/share/prometheus/console_libraries "
+                             "--web.console.templates=/usr/share/prometheus/consoles --storage.tsdb.retention={}h".format(retention))
 
     try:
         client.containers.list()
@@ -184,12 +190,12 @@ if __name__ == '__main__':
             for v in all_tag['v2']:
                 print(v)
             sys.exit()
-        elif version == 'v0':
+        elif version == '0':
             print('*' * 70)
             print('Please run the program with one of the following Prometheus version:')
             print('*' * 70)
             all_tag = get_all_prometheus_tag()
-            for v in all_tag['v2']:
+            for v in all_tag['0']:
                 print(v)
             sys.exit()
 
